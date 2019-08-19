@@ -32,12 +32,11 @@ public class SimpleServer {
                 DataOutputStream out = new DataOutputStream
                         (socket.getOutputStream());
 
-                double aNumber = in.readDouble();
-                System.out.println(aNumber);
-                double areal = aNumber * Math.PI * aNumber;
-                out.writeDouble(areal);
+                String text = in.readUTF();
+                System.out.println(text);
+                out.writeUTF(text);
 
-                if(aNumber == 0.0) { break; }
+                if(text == null) { break; }
             }
 
 

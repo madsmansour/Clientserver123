@@ -23,17 +23,17 @@ public class SimpleClient {
             DataOutputStream out = new DataOutputStream
                     (socket.getOutputStream());
             Scanner scanner = new Scanner(System.in);
-            double tal = 0.0;
+            String text;
 
             while (true) {
-                System.out.println("Skriv et tal: ");
-                tal = scanner.nextDouble();
+                System.out.println("Skriv noget tekst: ");
+                text = scanner.next();
 
                 // Send tallet til serveren
-                out.writeDouble(tal);
-                System.out.println("Areal der kommer tilbage fra sereveren: " + in.readDouble());
+                out.writeUTF(text);
+                System.out.println("Teksten der kommer tilbage fra serveren: " + in.readUTF());
 
-                if(tal == 0.0) { break; }
+                if(text == null) { break; }
 
             }
 
