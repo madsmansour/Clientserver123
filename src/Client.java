@@ -15,6 +15,9 @@ public class Client extends Application {
   // IO streams
   DataOutputStream toServer = null;
   DataInputStream fromServer = null;
+  String message;
+  String serverMessage;
+
 
   @Override // Override the start method in the Application class
   public void start(Stage primaryStage) {
@@ -22,7 +25,7 @@ public class Client extends Application {
     BorderPane paneForTextField = new BorderPane();
     paneForTextField.setPadding(new Insets(5, 5, 5, 5)); 
     paneForTextField.setStyle("-fx-border-color: green");
-    paneForTextField.setLeft(new Label("Enter a radius: "));
+    paneForTextField.setLeft(new Label("Enter your message"));
     
     TextField tf = new TextField();
     tf.setAlignment(Pos.BOTTOM_RIGHT);
@@ -39,44 +42,47 @@ public class Client extends Application {
     primaryStage.setTitle("Client"); // Set the stage title
     primaryStage.setScene(scene); // Place the scene in the stage
     primaryStage.show(); // Display the stage
-    
-    tf.setOnAction(e -> {
+
       try {
-        // Get the radius from the text field
-        double radius = Double.parseDouble(tf.getText().trim());
-  
-        // Send the radius to the server
-        toServer.writeDouble(radius);
-        toServer.flush();
-  
-        // Get area from the server
-        double area = fromServer.readDouble();
-  
-        // Display to the text area
-        ta.appendText("Radius is " + radius + "\n");
-        ta.appendText("Area received from the server is "
-          + area + '\n');
+          Socket socket = new Socket("192.168.43.92", 8001);
+          System.out.println("client connected");
+
+
+          // Create an input stream to receive data from the server
+          fromServer = new DataInputStream(socket.getInputStream());
+
+          // Create an output stream to send data to the server
+          toServer = new DataOutputStream(socket.getOutputStream());
       }
       catch (IOException ex) {
-        System.err.println(ex);
+          ta.appendText(ex.toString() + '\n');
+      }
+    tf.setOnAction(e -> {
+      try {
+
+          System.out.println("sending");
+        // Get the message from the text field
+        message = (tf.getText().trim());
+  
+        // Send the message to the server
+        toServer.writeUTF(message);
+        toServer.flush();
+  
+        // Get message from the server
+        serverMessage = fromServer.readUTF();
+  
+        // Display to the text area
+        ta.appendText("Server: " + serverMessage + "\n");
+
+          System.out.println("done");
+          tf.clear();
+      }
+      catch (IOException ex) {
+        System.out.println(ex);
       }
     });
-  
-    try {
-      // Create a socket to connect to the server
-      Socket socket = new Socket("localhost", 8000);
-      // Socket socket = new Socket("130.254.204.36", 8000);
-      // Socket socket = new Socket("drake.Armstrong.edu", 8000);
 
-      // Create an input stream to receive data from the server
-      fromServer = new DataInputStream(socket.getInputStream());
 
-      // Create an output stream to send data to the server
-      toServer = new DataOutputStream(socket.getOutputStream());
-    }
-    catch (IOException ex) {
-      ta.appendText(ex.toString() + '\n');
-    }
   }
 
   /**
